@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> Blog </title>
+<body>
+<style>
+
+    body{
+        margin:3em auto;
+        max-width:40em;
+        padding:0 .62em;
+        font: sans-serif
+    }
+    blockquote, pre, code {
+        background-color: #f0f0f0;
+        border-color: #222;
+    }
+        .vertical {
+            padding:15px auto;
+            border-left: 2.3px solid gray;
+            height: 180px auto;
+        }
+    h1,h2,h3 {
+        line-height:0.8
+    }
+    @media print{
+        body{
+            max-width:none
+        }
+    }
+    @media (prefers-color-scheme: dark){
+        body {color:#fff;background:#111}
+        a:link {color:#cdf}
+        a:hover, a:visited:hover {color:#def}
+        a:visited {color:#dcf}
+        blockquote, pre, code {
+                background-color: #2f2f2f;
+        }
+    }
+
+
+</style>
+<div>
+
+<h3>here you can see a rolling view of this blog!</h3>
+
+<hr>
+
+
+<p>Entries:</p>
+<div class="vertical">
+    <ul>
+
+        %ENTRIES%
+
+    </ul>
+</div>
+</div>
+</body>
+</head>
+</html>

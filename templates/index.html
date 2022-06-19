@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> Home </title>
+<body>
+<style>
+
+    body{
+        margin:1em auto;
+        max-width:40em;
+        padding:0 .62em;
+        font: sans-serif
+    }
+        .vertical {
+            padding:15px auto;
+            border-left: 2.3px solid gray;
+            height: 180px auto;
+        }
+        .footer {
+                  position: absolute;
+                  bottom: 0px;
+                  background-color: #111;
+                  width: 45%;
+                  text-align: center;
+                  font:0.8em/1.62 sans-serif
+         }
+    blockquote, pre, code {
+        background-color: #f0f0f0;
+        border-color: #111;
+    }
+    h1,h2,h3 {
+        line-height:1.2
+    }
+    @media print{
+        body{
+            max-width:none
+        }
+    }
+    @media (prefers-color-scheme: dark){
+        body {color:#fff;background:#111}
+        a:link {color:#cdf}
+        a:hover, a:visited:hover {color:#def}
+        a:visited {color:#dcf}
+        blockquote, pre, code {
+                background-color: #2f2f2f;
+        }
+    }
+
+
+</style>
+
+<h1>HOME </h1>
+
+<hr>
+
+
+<p>This is a simple template for the summary page!</p>
+
+<h4>Blog Entries:</h4>
+
+<div class="vertical">
+    <ul>
+
+    %ENTRIES%
+
+    </ul>
+</div>
+</body>
+</head>
+<p class="footer"> Last Updated on %DATE%</p>
+</html>
