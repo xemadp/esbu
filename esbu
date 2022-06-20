@@ -69,7 +69,7 @@ addsummary () {
 #create the "blogpage" which is a rolling view of blog posts.
 blogpage () {
         cat $TEMPLATES/blogpage.html > $DST/blogpage.html;
-        LATEST=$(ls -1td $SRC/*.md | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | head -n5 | tac) # take 5 of the latest posts and order them from new to oldest.
+        LATEST=$(ls -1td $SRC/*.md | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tac) # take 5 of the latest posts and order them from new to oldest.
         for t in $LATEST;
         do
                 DATE=$(getdate $t) # Set the date
