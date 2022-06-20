@@ -34,7 +34,7 @@ newpost () {
 editdrafts () {
         if [ -z "$1" ]; then
                 printf "No draft selected.\nDrafts:\n"
-                find "$DRAFTS" -type f | cut -d'.' -f1
+                basename `find "$DRAFTS" -type f` | cut -d'.' -f1
                 printf "\nexample : esbu draft *Draft-Name*\n"
                 exit
         else
@@ -155,7 +155,7 @@ finalize () {
 case $1 in
         new)    newpost "$2";; # Create a new markdown entry
         list)   printf "List of entries:\n"
-                find "$SRC" -maxdepth 1 -name "*.md" -print0 | xargs -n1 basename;;
+                find "$SRC" -maxdepth 1 -name "*.md" -print0 | xargs --null -n1 basename;;
         summary) addsummary;;
         draft)  editdrafts "$2";;
         remove) rm "$ENTRIES"/"$2".html
