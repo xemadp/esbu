@@ -60,6 +60,8 @@ will be :
 and thus maintaining the size mentioned.
 You can deactiate this by uncommenting the second markdown line in finalize function.
 
+for example usage of esbu check out [this link](https://asciinema.org/a/502910)
+
 ## TODO
 
 [ ] Add custom sync script support; 
