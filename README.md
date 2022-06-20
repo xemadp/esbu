@@ -1,7 +1,5 @@
 # esbu
 
-<hr>
-
 Simple utility for creating and managing static blog-style pages, all in one bash script.
 
 ## What does it do?
@@ -31,6 +29,9 @@ EXAMPLES:
 * esbu new newpost  => creates a new entry as newpost.md
 * esbu remove newpost => removes newpost
 * esbu list =>  lists all entries
+
+
+### Make sure you edit the SITE variable in esbu to whatever website you'd want to deploy to!
 
 \*\*\* *NOTE*  that esbu will create needed folders if they don't exist upon execution in the directory you run it in, so make sure you already have templates folder when you run it, otherwise an empty template folder will be created which will break things.
 
