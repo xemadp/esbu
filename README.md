@@ -11,6 +11,9 @@ Simple utility for creating and managing static blog-style pages, all in one bas
 * Creates a page with the rolling view of the blog.
 * Creates an rss feed.
 
+## Requirements
+require the markdown tool for converting .md files to .html files.
+
 ## Usage
 esbu OPTION arg1 [arg2]
 
