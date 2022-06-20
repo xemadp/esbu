@@ -33,6 +33,8 @@ EXAMPLES:
 
 ### Make sure you edit the SITE variable in esbu to whatever website you'd want to deploy to!
 
+for example usage of esbu check out [this link](https://asciinema.org/a/502910)
+
 \*\*\* *NOTE*  that esbu will create needed folders if they don't exist upon execution in the directory you run it in, so make sure you already have templates folder when you run it, otherwise an empty template folder will be created which will break things.
 
 you can use `esbu new newentry` to start editing newentry.md after editing it you can either add it to entry queue or make it a draft.
@@ -60,7 +62,6 @@ will be :
 and thus maintaining the size mentioned.
 You can deactiate this by uncommenting the second markdown line in finalize function.
 
-for example usage of esbu check out [this link](https://asciinema.org/a/502910)
 
 ## TODO
 
