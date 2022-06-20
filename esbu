@@ -7,151 +7,173 @@ TEMPLATES=$(pwd)/templates
 ENTRIES=$(pwd)/dst/entries
 SITE="example.com"
 
-[ -f $SRC ] || mkdir -p $SRC
-[ -f $DST ] || mkdir -p $DST
-[ -f $DRAFTS ] || mkdir -p $DRAFTS
-[ -f $ENTRIES ] || mkdir -p $ENTRIES
-[ -f $TEMPLATES ] || mkdir -p $TEMPLATES
+[ -f "$SRC" ] || mkdir -p "$SRC"
+[ -f "$DST" ] || mkdir -p "$DST"
+[ -f "$DRAFTS" ] || mkdir -p "$DRAFTS"
+[ -f "$ENTRIES" ] || mkdir -p "$ENTRIES"
+[ -f "$TEMPLATES" ] || mkdir -p "$TEMPLATES"
 
-# MAKE A NEW BLOG ENTRY
+# Make a new blog entry
 newpost () {
-        echo $1;
-        filepath=$SRC/$1.md;
-        $EDITOR $filepath;
+        echo "$1";
+        filepath="$SRC/$1.md";
+        "$EDITOR" "$filepath";
         printf "add to (d)rafts/(r)emove/add to (e)ntry queue\n[d/r/e]: ";
-        read choice;
-        case $choice in 
-                d) mv $filepath $DRAFTS/$1.md; printf "Added to drafts\n";;
+        read -r choice;
+        case "$choice" in 
+                d) mv "$filepath" "$DRAFTS"/"$1".md; printf "Added to drafts\n";;
                 e) printf "Added to src, ready to finalize\n" ;;
                 r) printf "Are you sure? [y/N]: ";
-                        read sure;
-                        [ "$sure" == "y" ] && rm $filepath || echo "Not Removed.\n";;
-                *) echo "Invalid Option. added to queue\n";;
+                   read -r sure;
+                   [ "$sure" = "y" ] && rm "$filepath" || printf "Not Removed.\n";;
+                *) printf "Invalid Option. added to queue\n";;
         esac
 }
 
 # Edit existing drafts
 editdrafts () {
-        [ -z "$1" ] && printf "No draft selected.\nDrafts:\n" && ls $DRAFTS | cut -d'.' -f1 && printf "\nexample : esbu draft *Draft-Name*\n" && exit \
-                || $EDITOR $DRAFTS/$1.md;printf "add the draft to entry queue? [y/N]: "; \
-                   read choice;
-                   case $choice in
-                           y) mv $DRAFTS/$1.md $SRC/$1.md && printf "moved draft to src.ready to finalize\n";;
-                           n) printf "Draft remains.\n";;
-                           *) printf "Invalid Option\n";;
+        if [ -z "$1" ]; then
+                printf "No draft selected.\nDrafts:\n"
+                find "$DRAFTS" -type f | cut -d'.' -f1
+                printf "\nexample : esbu draft *Draft-Name*\n"
+                exit
+        else
+                "$EDITOR" "$DRAFTS"/"$1".md
+                printf "add the draft to entry queue? [y/N]: "
+                read -r choice;
+                case $choice in
+                        y) mv "$DRAFTS"/"$1".md "$SRC"/"$1".md
+                           printf "moved draft to src.ready to finalize\n";;
+                        n) printf "Draft remains.\n";;
+                        *) printf "Invalid Option\n";;
+                esac
+        fi
+}
 
-                   esac
-                      
-           }
 
-
-# Get Date from already published entry
+# Get date from already published entry
 getdate () {
-        grep 'date-goes-here' $1 | head -n1 | cut -c 28- | cut -c -13;
+        grep 'date-goes-here' "$1" | head -n1 | cut -c 28- | cut -c -13;
 }
 
-#Add index summary of posts
+# Add index summary of posts
 addsummary () {
-        cat $TEMPLATES/index.html > $DST/index.html
-        LATEST=$(ls -1td $SRC/*.md | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | head -n5 | tac) # take 5 of the latest posts and order them from new to oldest.
+        cat "$TEMPLATES"/index.html > "$DST"/index.html
+        # Take 5 of the latest posts and order them from new to oldest.
+        LATEST=$(find "$SRC" -name "*.md" | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | head -n5 | tac)
         for t in $LATEST;
         do
-                DATE=$(getdate $t)
-                filename=$(basename $t);
-                TITLE=$(grep -m 1 "#" $SRC/${filename%.html}.md | tr -d '#' ); # use the first markdown heading as the Title.
-                sed -i "/%ENTRIES%/a <li>$DATE -<a href='https://$SITE/entries/$filename'> $TITLE <\/a><\/li>\\n" $DST/index.html; 
+                DATE=$(getdate "$t")
+                filename=$(basename "$t")
+                # Use the first markdown heading as the Title.
+                TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
+                sed -i "/%ENTRIES%/a <li>$DATE -<a href='https://$SITE/entries/$filename'> $TITLE <\/a><\/li>\\n" "$DST"/index.html
         done
-        sed -i "s/%ENTRIES%//" $DST/index.html;
-        sed -i "s/%DATE%/$DATE/" $DST/index.html; 
+        sed -i "s/%ENTRIES%//" "$DST"/index.html;
+        sed -i "s/%DATE%/$DATE/" "$DST"/index.html; 
 }
 
 
-#create the "blogpage" which is a rolling view of blog posts.
+# Create the "blogpage" which is a rolling view of blog posts.
 blogpage () {
-        cat $TEMPLATES/blogpage.html > $DST/blogpage.html;
-        LATEST=$(ls -1td $SRC/*.md | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tac) # take 5 of the latest posts and order them from new to oldest.
+        cat "$TEMPLATES"/blogpage.html > "$DST"/blogpage.html;
+        # Take all of the latest posts and order them from new to oldest.
+        LATEST=$(find "$SRC" -name "*.md" | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tac) 
         for t in $LATEST;
         do
-                DATE=$(getdate $t) # Set the date
-                filename=$(basename $t);
-                TITLE=$(grep -m 1 "#" $SRC/${filename%.html}.md | tr -d '#' ); # use the first markdown heading as the Title.
-                sed -i "/%ENTRIES%/a <li><a href='https://$SITE/entries/$filename'>$DATE : $TITLE <\/a><\/li>\\n" $DST/blogpage.html; 
+                DATE=$(getdate "$t") # Set the date
+                filename=$(basename "$t");
+                # Use the first markdown heading as the Title.
+                TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
+                sed -i "/%ENTRIES%/a <li><a href='https://$SITE/entries/$filename'>$DATE : $TITLE <\/a><\/li>\\n" "$DST"/blogpage.html; 
         done
-        sed -i "s/%ENTRIES%//" $DST/blogpage.html;
+        sed -i "s/%ENTRIES%//" "$DST"/blogpage.html;
 }
 
-# adds a blog post to rss.xml
+# Adds a blog post to rss.xml
 additem () {
-        # checks if entry with the same name already exists, if so, it uses the Date in the existing entry as DATE, otherwise it uses current date.
-        [ -f $ENTRIES/${2%.md}.html ] && DATE=$(grep 'class="date"' $ENTRIES/${2%.md}.html | head -n1 | cut -c 21- | cut -c -25) || DATE=$(date -R); 
+        # Checks if entry with the same name already exists, if so, it uses the Date in the existing entry
+        # as DATE, otherwise it uses current date.
+        if [ -f "$ENTRIES"/"${2%.md}".html ]; then
+                DATE=$(grep 'class="date"' "$ENTRIES"/"${2%.md}".html | head -n1 | cut -c 21- | cut -c -25)
+        else
+                DATE=$(date -R)
+        fi
 
-        TITLE=$(grep -m 1 "#" $1 | tr -d '#' ); # use the first heading as the Title.
+        TITLE=$(grep -m 1 "#" "$1" | tr -d '#' ); # Use the first heading as the Title.
  
         sed -e "s:%NAME%:$NAME:" \
             -e "s/%URL%/entries\/${2%.md}.html/" \
             -e "s/%DATE%/$DATE/" -e "s/%CONTENT%]]><\/description>//" \
-            -e "s/<\/item>//" $TEMPLATES/item.xml >> $DST/rss.xml;
+            -e "s/<\/item>//" "$TEMPLATES"/item.xml >> "$DST"/rss.xml;
 
         sed -e 's/\/> <!---height=//g' \
-            -e 's/H--->/\/>/g' $3 >> $DST/rss.xml;
+            -e 's/H--->/\/>/g' "$3" >> "$DST"/rss.xml;
 
-        echo "]]></description>" >> $DST/rss.xml;
-        echo "</item>" >> $DST/rss.xml;
+        echo "]]></description>" >> "$DST"/rss.xml;
+        echo "</item>" >> "$DST"/rss.xml;
 }
 
-# Make new individual entry.
+# Make new individual entry
 makepage () { 
         DATE=$(date -R); # use current date as DATE
-        NAME=$(grep "#" $SRC/$1 | head -n1 | cut -c 3-) # use the first heading as Title
+        NAME=$(grep "#" "$SRC"/"$1" | head -n1 | cut -c 3-) # use the first heading as Title
 
-        sed "/%CONTENT%/r $2" $TEMPLATES/entry.html | sed -e 's/%CONTENT%//' \
-                                                          -e "s/%DATE%/<!--date-goes-here-$DATE-->/" \
-                                                          -e "s:%TITLE%:$NAME:" \
-                                                                > $ENTRIES/${1%.md}.html
+        sed "/%CONTENT%/r $2" "$TEMPLATES"/entry.html \
+                | sed -e 's/%CONTENT%//' \
+                        -e "s/%DATE%/<!--date-goes-here-$DATE-->/" \
+                        -e "s:%TITLE%:$NAME:" \
+                        > "$ENTRIES"/"${1%.md}".html
 }
 
-#Take all markdown files in src/ (excluding drafts) and create corresponding html files in entries/, also creates/updates rss feed , blogpage and index.html
+# Take all markdown files in src/ (excluding drafts) and create corresponding html files in entries/,
+# also creates/updates rss feed , blogpage and index.html
 finalize () {
-        head -n -3 $TEMPLATES/rss.xml > $DST/rss.xml # initialize rss.xml to add items to later
+        head -n -3 "$TEMPLATES"/rss.xml > "$DST"/rss.xml # initialize rss.xml to add items to later
 
-        FILES=$(ls -1td $SRC/*.md )
+        FILES=$(find "$SRC" -name "*.md")
         for entry in $FILES;
         do
-                file=$(basename $entry);
+                file=$(basename "$entry");
                 RAWHTML=$ENTRIES/${file%.md}-tmp.html;
                
-                markdown -f fencedcode $entry | sed -e 's/\/> <!---height=/ style="width:100%;height:auto;max-width:/g' \
-                                                    -e 's/H--->/px" \/>/g' > $RAWHTML;
+                markdown -f fencedcode "$entry" | \
+                        sed -e 's/\/> <!---height=/ style="width:100%;height:auto;max-width:/g' \
+                            -e 's/H--->/px" \/>/g' > "$RAWHTML";
                
-                [ -f $ENTRIES/${file%.md}.html ] || makepage $file $RAWHTML;
-                additem $entry $file $RAWHTML; # add entry to rss.xml 
-                [ -f $RAWHTML ] && rm $RAWHTML 
+                [ -f "$ENTRIES"/"${file%.md}".html ] || makepage "$file" "$RAWHTML";
+                additem "$entry" "$file" "$RAWHTML" # Add entry to rss.xml 
+                [ -f "$RAWHTML" ] && rm "$RAWHTML" 
         done
 
-        echo "</channel>" >> $DST/rss.xml
-        echo "</rss>" >> $DST/rss.xml
+        echo "</channel>" >> "$DST"/rss.xml
+        echo "</rss>" >> "$DST"/rss.xml
         addsummary;
         blogpage;
 }
 
 case $1 in
-        new) newpost $2;; # Create a new markdown entry
-        list) echo "List of entries:";find $SRC -maxdepth 1 -name "*.md" | xargs -n1 basename;;
+        new)    newpost "$2";; # Create a new markdown entry
+        list)   printf "List of entries:\n"
+                find "$SRC" -maxdepth 1 -name "*.md" -print0 | xargs -n1 basename;;
         summary) addsummary;;
-        draft) editdrafts $2;;
-        remove) rm $ENTRIES/$2.html & rm $SRC/$2.md && echo "Removed $2 from entries" || printf "\n'$2' doesn't exist";;
+        draft)  editdrafts "$2";;
+        remove) rm "$ENTRIES"/"$2".html
+                rm "$SRC"/"$2".md \
+                        && printf "Removed %s from entries" "$2" \
+                        || printf "\n%s doesn't exist" "$2";;
         finalize) finalize;;
-        *) printf "esbu OPTION arg1 [arg2]\n"
-           printf "OPTIONS:\n"
-           printf "\tnew - create new blog post\n"
-           printf "\tlist - list all blog entries\n"
-           printf "\tsummary - make index.html\n"
-           printf "\tdraft - edit drafts\n"
-           printf "\tfinalize - finalize blog - ready to deploy\n"
-           printf "\tremove - remove a given entry name\n"
-           printf "EXAMPLES:\n"
-           printf "\tesbu new newpost  => creates a new entry as newpost.md\n"
-           printf "\tesbu remove newpost => removes newpost\n"
-           printf "\tesbu list =>  lists all entries\n";;
+        *)      printf "esbu OPTION arg1 [arg2]\n"
+                printf "OPTIONS:\n"
+                printf "\tnew - create new blog post\n"
+                printf "\tlist - list all blog entries\n"
+                printf "\tsummary - make index.html\n"
+                printf "\tdraft - edit drafts\n"
+                printf "\tfinalize - finalize blog - ready to deploy\n"
+                printf "\tremove - remove a given entry name\n"
+                printf "EXAMPLES:\n"
+                printf "\tesbu new newpost  => creates a new entry as newpost.md\n"
+                printf "\tesbu remove newpost => removes newpost\n"
+                printf "\tesbu list =>  lists all entries\n";;
 esac
 exit $?
