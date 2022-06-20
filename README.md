@@ -12,7 +12,7 @@ Simple utility for creating and managing static blog-style pages, all in one bas
 * Creates an rss feed.
 
 ## Requirements
-require the markdown tool for converting .md files to .html files.
+requires the markdown tool for converting .md files to .html files.
 
 ## Usage
 esbu OPTION arg1 [arg2]
