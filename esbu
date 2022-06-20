@@ -47,7 +47,7 @@ editdrafts () {
 
 # Get Date from already published entry
 getdate () {
-        grep 'date-goes-here' $1 | head -n1 | cut -c 29- | cut -c -11;
+        grep 'date-goes-here' $1 | head -n1 | cut -c 28- | cut -c -13;
 }
 
 #Add index summary of posts
