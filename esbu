@@ -24,8 +24,11 @@ newpost () {
                 d) mv "$filepath" "$DRAFTS"/"$1".md; printf "Added to drafts\n";;
                 e) printf "Added to src, ready to finalize\n" ;;
                 r) printf "Are you sure? [y/N]: ";
-                   read -r sure;
-                   [ "$sure" = "y" ] && rm "$filepath" || printf "Not Removed.\n";;
+                   read -r c;
+                   case "$c" in
+                           y|Y) rm "$filepath";;
+                           *) printf "Not Removed.\n";;
+                   esac;;
                 *) printf "Invalid Option. added to queue\n";;
         esac
 }
@@ -42,9 +45,9 @@ editdrafts () {
                 printf "add the draft to entry queue? [y/N]: "
                 read -r choice;
                 case $choice in
-                        y) mv "$DRAFTS"/"$1".md "$SRC"/"$1".md
+                        y|Y) mv "$DRAFTS"/"$1".md "$SRC"/"$1".md
                            printf "moved draft to src.ready to finalize\n";;
-                        n) printf "Draft remains.\n";;
+                        n|N) printf "Draft remains.\n";;
                         *) printf "Invalid Option\n";;
                 esac
         fi
@@ -60,7 +63,7 @@ getdate () {
 addsummary () {
         cat "$TEMPLATES"/index.html > "$DST"/index.html
         # Take 5 of the latest posts and order them from new to oldest.
-        LATEST=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3 | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tail -n5 )
+        LATEST=$(find "$SRC" -maxdepth 1 -type f -name "*.md" -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3 | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tail -n5 )
         for t in $LATEST;
         do
                 DATE=$(getdate "$t")
@@ -134,7 +137,7 @@ makepage () {
 finalize () {
         head -n -3 "$TEMPLATES"/rss.xml > "$DST"/rss.xml # initialize rss.xml to add items to later
 
-        FILES=$(find "$SRC" -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3)
+        FILES=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3)
         for entry in $FILES;
         do
                 file=$(basename "$entry");
@@ -156,27 +159,27 @@ finalize () {
 }
 
 case $1 in
-        new)    newpost "$2";; # Create a new markdown entry
-        list)   printf "List of entries:\n"
-                find "$SRC" -maxdepth 1 -type f  -exec basename {} \; | cut -d'.' -f1;;
-        summary) addsummary;;
-        draft)  editdrafts "$2";;
-        remove) rm "$ENTRIES"/"$2".html
+        n|new)    newpost "$2";; # Create a new markdown entry
+        l|list)   printf "List of entries:\n"
+                find "$SRC" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1;;
+        s|summary) addsummary;;
+        d|draft)  editdrafts "$2";;
+        r|remove) rm "$ENTRIES"/"$2".html
                 rm "$SRC"/"$2".md \
                         && printf "Removed %s from entries" "$2" \
                         || printf "\n%s doesn't exist" "$2";;
-        finalize) finalize;;
+        f|finalize) finalize;;
         *)      printf "esbu OPTION arg1 [arg2]\n"
                 printf "OPTIONS:\n"
-                printf "\tnew - create new blog post\n"
-                printf "\tlist - list all blog entries\n"
-                printf "\tsummary - make index.html\n"
-                printf "\tdraft - edit drafts\n"
-                printf "\tfinalize - finalize blog - ready to deploy\n"
-                printf "\tremove - remove a given entry name\n"
+                printf "\tn, new - create new blog post\n"
+                printf "\tl, list - list all blog entries\n"
+                printf "\ts, summary - make index.html\n"
+                printf "\td, draft - edit drafts\n"
+                printf "\tf, finalize - finalize blog - ready to deploy\n"
+                printf "\tr, remove - remove a given entry name\n"
                 printf "EXAMPLES:\n"
                 printf "\tesbu new newpost  => creates a new entry as newpost.md\n"
-                printf "\tesbu remove newpost => removes newpost\n"
-                printf "\tesbu list =>  lists all entries\n";;
+                printf "\tesbu list =>  lists all entries\n"
+                printf "\tesbu r newpost => removes newpost\n";;
 esac
 exit $?
