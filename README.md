@@ -46,12 +46,12 @@ for example if you had entry1.md and finalized it yesterday, that means that if 
 ## Templates
 You need to have all the files that are in the templates folder, Make sure you edit templates to suit your own blog, You can practically change everything in templates *EXCEPT* from strings that are in this %FORMAT%, they are used in esbu in order to generate pages so don't delete/change them.
 
-### quirks
-You can put `<!---height=X H-->` where X is pixels, after a photo in a markdown file and esbu will maintain the mentioned size in the html file as well.
+### Features
+You can put `<!---height=Xpx-->` where X is the amount of pixels, after a photo in a markdown file and esbu will maintain the mentioned size in the html file as well.
 example:
 
 ``` md
-![](image.jpg) <!---height=350 H--->
+![](image.jpg) <!---height=350px--->
 ```
 
 will be :
