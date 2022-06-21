@@ -108,9 +108,8 @@ additem () {
         cat "$TEMPLATES"/item.xml >> "$DST"/rss.xml;
         sed -i -e "s:%NAME%:$NAME:" \
             -e "s/%URL%/entries\/${2%.md}.html/" \
-            -e "s/%DATE%/$DATE/" -e "s/%CONTENT%]]><\/description>//" \
-            -e "s/<\/item>//" "$DST"/rss.xml;
-        
+            -e "s/%DATE%/$DATE/" -e "s/%CONTENT%]]><\/description>//" "$DST"/rss.xml;
+       #...........^^^^^^.................... 
 
         cat "$3" >> "$DST"/rss.xml;
         sed -i -e 's/\/> <!---height=//g' \
