@@ -112,7 +112,7 @@ additem () {
             -e "s/<\/item>//" "$DST"/rss.xml;
         
 
-        cat $3 >> "$DST"/rss.xml;
+        cat "$3" >> "$DST"/rss.xml;
         sed -i -e 's/\/> <!---height=//g' \
             -e 's/H--->/\/>/g' "$DST"/rss.xml;
 
