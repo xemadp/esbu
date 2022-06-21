@@ -144,7 +144,7 @@ finalize () {
                
                 markdown -f fencedcode "$entry" | \
                         sed -e 's/\/> <!---height=/ style="width:100%;height:auto;max-width:/g' \
-                            -e 's/H--->/px" \/>/g' > "$RAWHTML";
+                            -e 's/px--->/px" \/>/g' > "$RAWHTML";
                
                 [ -f "$ENTRIES"/"${file%.md}".html ] || makepage "$file" "$RAWHTML";
                 additem "$entry" "$file" "$RAWHTML" # Add entry to rss.xml 
