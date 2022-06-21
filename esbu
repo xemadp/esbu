@@ -60,7 +60,7 @@ getdate () {
 addsummary () {
         cat "$TEMPLATES"/index.html > "$DST"/index.html
         # Take 5 of the latest posts and order them from new to oldest.
-        LATEST=$(find "$SRC" -name "*.md" | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | head -n5 | tac)
+        LATEST=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3 | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tail -n5 )
         for t in $LATEST;
         do
                 DATE=$(getdate "$t")
@@ -78,7 +78,7 @@ addsummary () {
 blogpage () {
         cat "$TEMPLATES"/blogpage.html > "$DST"/blogpage.html;
         # Take all of the latest posts and order them from new to oldest.
-        LATEST=$(find "$SRC" -name "*.md" | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tac) 
+        LATEST=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3 | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g")
         for t in $LATEST;
         do
                 DATE=$(getdate "$t") # Set the date
@@ -95,20 +95,23 @@ additem () {
         # Checks if entry with the same name already exists, if so, it uses the Date in the existing entry
         # as DATE, otherwise it uses current date.
         if [ -f "$ENTRIES"/"${2%.md}".html ]; then
-                DATE=$(grep 'class="date"' "$ENTRIES"/"${2%.md}".html | head -n1 | cut -c 21- | cut -c -25)
+                DATE=$(grep 'date-goes-here' "$ENTRIES"/"${2%.md}".html | head -n1 | cut -c 28- | cut -c -13)
         else
                 DATE=$(date -R)
         fi
 
         TITLE=$(grep -m 1 "#" "$1" | tr -d '#' ); # Use the first heading as the Title.
- 
-        sed -e "s:%NAME%:$NAME:" \
+
+        cat "$TEMPLATES"/item.xml >> "$DST"/rss.xml;
+        sed -i -e "s:%NAME%:$NAME:" \
             -e "s/%URL%/entries\/${2%.md}.html/" \
             -e "s/%DATE%/$DATE/" -e "s/%CONTENT%]]><\/description>//" \
-            -e "s/<\/item>//" "$TEMPLATES"/item.xml >> "$DST"/rss.xml;
+            -e "s/<\/item>//" "$DST"/rss.xml;
+        
 
-        sed -e 's/\/> <!---height=//g' \
-            -e 's/H--->/\/>/g' "$3" >> "$DST"/rss.xml;
+        cat $3 >> "$DST"/rss.xml;
+        sed -i -e 's/\/> <!---height=//g' \
+            -e 's/H--->/\/>/g' "$DST"/rss.xml;
 
         echo "]]></description>" >> "$DST"/rss.xml;
         echo "</item>" >> "$DST"/rss.xml;
@@ -131,7 +134,7 @@ makepage () {
 finalize () {
         head -n -3 "$TEMPLATES"/rss.xml > "$DST"/rss.xml # initialize rss.xml to add items to later
 
-        FILES=$(find "$SRC" -name "*.md")
+        FILES=$(find "$SRC" -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3)
         for entry in $FILES;
         do
                 file=$(basename "$entry");
@@ -154,8 +157,8 @@ finalize () {
 
 case $1 in
         new)    newpost "$2";; # Create a new markdown entry
-        list)   printf "List of entries:\n\n"
-                find "$DRAFTS" -type f -exec basename {} \; | cut -d'.' -f1 ;;
+        list)   printf "List of entries:\n"
+                find "$SRC" -maxdepth 1 -type f  -exec basename {} \; | cut -d'.' -f1;;
         summary) addsummary;;
         draft)  editdrafts "$2";;
         remove) rm "$ENTRIES"/"$2".html
