@@ -14,22 +14,20 @@ requires the markdown tool for converting .md files to .html files.
 
 ## Usage
 esbu OPTION arg1 [arg2]
-
 OPTIONS:
 
-* new - create new blog post
-* list - list all blog entries
-* remove - remove a given entry name
-* draft - edit drafts
-* summary - make index.html ( contains a summary of entries )
-* finalize - finalize blog - ready to deploy
+* n, new - create new blog post
+* l, list - list all blog entries
+* r, remove - remove a given entry name
+* d, draft - edit drafts
+* s, summary - make index.html ( contains a summary of entries )
+* f, finalize - finalize blog - ready to deploy
 
 EXAMPLES:
 
 * esbu new newpost  => creates a new entry as newpost.md
 * esbu remove newpost => removes newpost
 * esbu list =>  lists all entries
-
 
 ### Make sure you edit the SITE variable in esbu to whatever website you'd want to deploy to!
 
