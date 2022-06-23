@@ -18,7 +18,7 @@ SITE="example.com"
 # Make a new blog entry
 newpost () {
         filepath="$SRC/$1.md";
-        [ -z $1 ] && printf "Entry name cannot be empty!\n" && exit
+        [ -z $1 ] && printf "Entry name cannot be empty!\n" && exit 1
         if [ -f "$filepath" ]; then
                 printf "%s Already exists!\n" "$1";
         else
@@ -37,7 +37,7 @@ newpost () {
                                    y|Y) rm "$filepath";;
                                    *) printf "Not Removed.\n";;
                            esac;;
-                        *) printf "Invalid Option. added to queue\n";;
+                        *) printf "Invalid Option. added to queue\n"; exit 1;;
                 esac
         fi
 }
@@ -46,7 +46,7 @@ editpost() {
         [ -z $1 ] && printf "Entry name cannot be empty!\n" \
                   && printf "List of entries:\n" \
                   && find "$SRC" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1 \
-                  && exit;
+                  && exit 1;
 
         filepath="$SRC/$1.md";
         if [ -f "$filepath" ]; then
@@ -75,7 +75,7 @@ editdrafts () {
                         y|Y) mv "$DRAFTS"/"$1".md "$SRC"/"$1".md
                            printf "moved draft to src.ready to finalize\n";;
                         n|N) printf "Draft remains.\n";;
-                        *) printf "Invalid Option\n";;
+                        *) printf "Invalid Option\n"; exit 1;;
                 esac
         fi
 }
@@ -202,7 +202,7 @@ case $1 in
         r|remove) rm "$ENTRIES"/"$2".html
                 rm "$SRC"/"$2".md \
                         && printf "Removed %s from entries\n" "$2" \
-                        || printf "\n%s doesn't exist\n" "$2";;
+                        || printf "\n%s doesn't exist\n" "$2"; exit 1;;
         f|finalize) finalize;;
         *)      printf "esbu OPTION arg1 [arg2]\n"
                 printf "OPTIONS:\n"
