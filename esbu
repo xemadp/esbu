@@ -109,7 +109,6 @@ additem () {
         sed -i -e "s:%NAME%:$NAME:" \
             -e "s/%URL%/entries\/${2%.md}.html/" \
             -e "s/%DATE%/$DATE/" -e "s/%CONTENT%]]><\/description>//" "$DST"/rss.xml;
-       #...........^^^^^^.................... 
 
         cat "$3" >> "$DST"/rss.xml;
         sed -i -e 's/\/> <!---height=//g' \
@@ -136,9 +135,10 @@ makepage () {
 finalize () {
         head -n -3 "$TEMPLATES"/rss.xml > "$DST"/rss.xml # initialize rss.xml to add items to later
 
-        FILES=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3)
+        FILES=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3) # sort .md files by time from oldest to newest.
         for entry in $FILES;
         do
+                echo "$entry";
                 file=$(basename "$entry");
                 RAWHTML=$ENTRIES/${file%.md}-tmp.html;
                
