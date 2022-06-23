@@ -93,13 +93,19 @@ addsummary () {
 
 # Sort .md files in $SRC in order of creation time
 sortfiles() {
-        #Create a list of entries alongside their creation date seperated by spaces, each at a new line
-        LIST=$(find "$SRC" -maxdepth 1 -type f -print0 | xargs -0 grep -m 1 "the creation date is:" | sed -e "s:.*/\(.*\):\1:g" -e "s/:<\!---the creation date is://" -e "s/ --->//g" );
-        # Iterate over the sorted dates, find the corresponding entry and print it.
-        for d in $( echo "$LIST" | sed -e "s/.*\.md //" | sort -n -k3 | tr " " "." ); do
-                date=$(echo "$d" | tr "." " ");
-                echo "$LIST" | grep "$date" | cut -d' ' -f1;
-        done
+        #Don't sort if there's only one entry.
+        size=$(find $SRC -maxdepth 1 -type f -name "*md" | wc -l )
+        if [ $size = 1 ]; then
+                find "$SRC" -maxdepth 1 -type f -name "*.md" -exec basename {} \;   
+        else  
+                #Create a list of entries alongside their creation date seperated by spaces, each at a new line
+                LIST=$(find "$SRC" -maxdepth 1 -type f -print0 | xargs -0 grep -m 1 "the creation date is:" | sed -e "s:.*/\(.*\):\1:g" -e "s/:<\!---the creation date is://" -e "s/ --->//g" );
+                # Iterate over the sorted dates, find the corresponding entry and print it.
+                for d in $( echo "$LIST" | sed -e "s/.*\.md //" | sort -n -k3 | tr " " "." ); do
+                        date=$(echo "$d" | tr "." " ");
+                        echo "$LIST" | grep "$date" | cut -d' ' -f1;
+                done
+        fi
 }
 
 # Create the "blogpage" which is a rolling view of blog posts.
@@ -118,13 +124,7 @@ blogpage () {
 
 # Adds a blog post to rss.xml
 additem () {
-        # Checks if entry with the same name already exists, if so, it uses the Date in the existing entry
-        # as DATE, otherwise it uses current date.
-        if [ -f "$ENTRIES"/"${2%.md}".html ]; then
-                DATE=$(grep 'date-goes-here' "$ENTRIES"/"${2%.md}".html | head -n1 | cut -c 28- | cut -c -13)
-        else
-                DATE=$(date -R)
-        fi
+        DATE=$(date -R -d "$(grep -h -m 1 "the creation date is: " "$1" | sed -e "s/<\!---the creation date is: //" -e "s/--->//g")" )
 
         TITLE=$(grep -m 1 "#" "$1" | tr -d '#' ); # Use the first heading as the Title.
 
@@ -135,7 +135,7 @@ additem () {
 
         cat "$3" >> "$DST"/rss.xml;
         sed -i -e 's/\/> <!---height=//g' \
-            -e 's/H--->/\/>/g' "$DST"/rss.xml;
+            -e 's/px--->/\/>/g' "$DST"/rss.xml;
 
         echo "]]></description>" >> "$DST"/rss.xml;
         echo "</item>" >> "$DST"/rss.xml;
@@ -158,8 +158,7 @@ finalize () {
 
         # Take all of the latest posts and order them from new to oldest.
         LATEST=$(sortfiles | sed -e "s:^:$ENTRIES/:g" -e "s/\.md/\.html/g" )
-
-        FILES=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3) # sort .md files by time from oldest to newest.
+        FILES=$(sortfiles | sed -e "s:^:$SRC/:g" | tac)# sort .md files by time from oldest to newest.
         for entry in $FILES;
         do
                 file=$(basename "$entry");
@@ -185,7 +184,6 @@ case $1 in
         e|edit)    editpost "$2";; # Create a new markdown entry
         l|list)   printf "List of entries:\n"
                 find "$SRC" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1;;
-        s|summary) addsummary;;
         d|draft)  editdrafts "$2";;
         r|remove) rm "$ENTRIES"/"$2".html
                 rm "$SRC"/"$2".md \
@@ -197,7 +195,6 @@ case $1 in
                 printf "\tn, new - create new blog post\n"
                 printf "\te, edit - edit already existing blog posts\n"
                 printf "\tl, list - list all blog entries\n"
-                printf "\ts, summary - make index.html\n"
                 printf "\td, draft - edit drafts\n"
                 printf "\tf, finalize - finalize blog - ready to deploy\n"
                 printf "\tr, remove - remove a given entry name\n"
