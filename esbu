@@ -21,7 +21,7 @@ newpost () {
         if [ -f "$filepath" ]; then
                 printf "%s Already exists!\n" "$1";
         else
-                DATE=$(date -R | cut -c 6- | cut -c -20);
+                DATE=$(date --rfc-3339="ns" | cut -d'.' -f1);
                 "$EDITOR" "$filepath";
                 printf "add to (d)rafts/(r)emove/add to (e)ntry queue\n[d/r/e]: ";
                 sed -i -e "1s/^/<!---the creation date is: $DATE --->\n/" \
@@ -71,15 +71,15 @@ editdrafts () {
 
 # Get date from already published entry
 getdate () {
-        grep 'date-goes-here' "$1" | tail -n1 | cut -c 28- | cut -c -13;
+        filedir=$(echo "$1" | sed -e "s/dst\/entries/src/" -e "s/\.html/\.md/")
+        date -R -d "$(grep -h -m 1 "the creation date is: " "$filedir" | sed -e "s/<\!---the creation date is: //" -e "s/--->//g")" | cut -c -16 | cut -c 6-; 
 }
 
 # Add index summary of posts
 addsummary () {
         cat "$TEMPLATES"/index.html > "$DST"/index.html
         # Take 5 of the latest posts and order them from new to oldest.
-        LATEST=$(find "$SRC" -maxdepth 1 -type f -name "*.md" -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3 | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g" | tail -n5 )
-        for t in $LATEST;
+        for t in $(echo "$LATEST" | tail -n5);
         do
                 DATE=$(getdate "$t")
                 filename=$(basename "$t")
@@ -91,11 +91,20 @@ addsummary () {
         sed -i "s/%DATE%/$DATE/" "$DST"/index.html; 
 }
 
+# Sort .md files in $SRC in order of creation time
+sortfiles() {
+        #Create a list of entries alongside their creation date seperated by spaces, each at a new line
+        LIST=$(find "$SRC" -maxdepth 1 -type f -print0 | xargs -0 grep -m 1 "the creation date is:" | sed -e "s:.*/\(.*\):\1:g" -e "s/:<\!---the creation date is://" -e "s/ --->//g" );
+        # Iterate over the sorted dates, find the corresponding entry and print it.
+        for d in $( echo "$LIST" | sed -e "s/.*\.md //" | sort -n -k3 | tr " " "." ); do
+                date=$(echo "$d" | tr "." " ");
+                echo "$LIST" | grep "$date" | cut -d' ' -f1;
+        done
+}
+
 # Create the "blogpage" which is a rolling view of blog posts.
 blogpage () {
         cat "$TEMPLATES"/blogpage.html > "$DST"/blogpage.html;
-        # Take all of the latest posts and order them from new to oldest.
-        LATEST=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3 | sed -e "s/src/dst\/entries/g" -e "s/.md/.html/g")
         for t in $LATEST;
         do
                 DATE=$(getdate "$t") # Set the date
@@ -134,12 +143,10 @@ additem () {
 
 # Make new individual entry
 makepage () { 
-        DATE=$(date -R); # use current date as DATE
-        NAME=$(grep "#" "$SRC"/"$1" | head -n1 | cut -c 3-) # use the first heading as Title
+        NAME=$(grep -m 1 "#" "$SRC/$1" | tr -d '#' ); # Use the first heading as the Name.
 
         sed "/%CONTENT%/r $2" "$TEMPLATES"/entry.html \
                 | sed -e 's/%CONTENT%//' \
-                        -e "s/%DATE%/<!--date-goes-here-$DATE-->/" \
                         -e "s:%TITLE%:$NAME:" \
                         > "$ENTRIES"/"${1%.md}".html
 }
@@ -148,6 +155,9 @@ makepage () {
 # also creates/updates rss feed , blogpage and index.html
 finalize () {
         head -n -3 "$TEMPLATES"/rss.xml > "$DST"/rss.xml # initialize rss.xml to add items to later
+
+        # Take all of the latest posts and order them from new to oldest.
+        LATEST=$(sortfiles | sed -e "s:^:$ENTRIES/:g" -e "s/\.md/\.html/g" )
 
         FILES=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3) # sort .md files by time from oldest to newest.
         for entry in $FILES;

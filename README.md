@@ -65,4 +65,4 @@ You can deactiate this by uncommenting the second markdown line in finalize func
 ## TODO
 
 - [ ] Add custom sync script support;
-- [ ] Add dates to markdown entries
+- [x] Add dates to markdown entries
