@@ -5,7 +5,6 @@ Simple utility for creating and managing static blog-style pages, all in one bas
 ## What does it do?
 * Markdown entries from src/ get converted to html files in dst/entries/.
 * Capable of maintaining drafts.
-* Creates a summary page with the five most recent blog entries.
 * Creates a page with the rolling view of the blog.
 * Creates an rss feed.
 
@@ -21,7 +20,6 @@ OPTIONS:
 * l, list - list all blog entries
 * r, remove - remove a given entry name
 * d, draft - edit drafts
-* s, summary - make index.html ( contains a summary of entries )
 * f, finalize - finalize blog - ready to deploy
 
 EXAMPLES:
