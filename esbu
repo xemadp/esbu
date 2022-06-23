@@ -43,9 +43,13 @@ newpost () {
 editpost() {
         filepath="$SRC/$1.md";
         if [ -f "$filepath" ]; then
+                [ -f "$ENTRIES/$1.html" ] && rm "$ENTRIES/$1.html"
                 "$EDITOR" "$filepath";
         else
                 printf "%s Doesn't exist!\n" "$1"
+                printf "List of entries:\n"
+                find "$SRC" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1;
+
         fi
 }
 # Edit existing drafts
@@ -94,7 +98,7 @@ addsummary () {
 # Sort .md files in $SRC in order of creation time
 sortfiles() {
         #Don't sort if there's only one entry.
-        size=$(find $SRC -maxdepth 1 -type f -name "*md" | wc -l )
+        size=$(find $SRC -maxdepth 1 -type f -name "*.md" | wc -l )
         if [ $size = 1 ]; then
                 find "$SRC" -maxdepth 1 -type f -name "*.md" -exec basename {} \;   
         else  
@@ -158,7 +162,9 @@ finalize () {
 
         # Take all of the latest posts and order them from new to oldest.
         LATEST=$(sortfiles | sed -e "s:^:$ENTRIES/:g" -e "s/\.md/\.html/g" )
-        FILES=$(sortfiles | sed -e "s:^:$SRC/:g" | tac)# sort .md files by time from oldest to newest.
+
+        # sort .md files by time from oldest to newest.
+        FILES=$(sortfiles | sed -e "s:^:$SRC/:g" | tac)
         for entry in $FILES;
         do
                 file=$(basename "$entry");
