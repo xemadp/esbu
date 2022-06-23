@@ -17,6 +17,7 @@ esbu OPTION arg1 [arg2]
 OPTIONS:
 
 * n, new - create new blog post
+* e, edit - edit already existing blog posts
 * l, list - list all blog entries
 * r, remove - remove a given entry name
 * d, draft - edit drafts

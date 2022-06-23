@@ -7,6 +7,8 @@ TEMPLATES=$(pwd)/templates
 ENTRIES=$(pwd)/dst/entries
 SITE="example.com"
 
+[ -z "$EDITOR" ] && EDITOR=/usr/bin/nano
+
 [ -f "$SRC" ] || mkdir -p "$SRC"
 [ -f "$DST" ] || mkdir -p "$DST"
 [ -f "$DRAFTS" ] || mkdir -p "$DRAFTS"
@@ -15,24 +17,34 @@ SITE="example.com"
 
 # Make a new blog entry
 newpost () {
-        echo "$1";
         filepath="$SRC/$1.md";
-        "$EDITOR" "$filepath";
-        printf "add to (d)rafts/(r)emove/add to (e)ntry queue\n[d/r/e]: ";
-        read -r choice;
-        case "$choice" in 
-                d) mv "$filepath" "$DRAFTS"/"$1".md; printf "Added to drafts\n";;
-                e) printf "Added to src, ready to finalize\n" ;;
-                r) printf "Are you sure? [y/N]: ";
-                   read -r c;
-                   case "$c" in
-                           y|Y) rm "$filepath";;
-                           *) printf "Not Removed.\n";;
-                   esac;;
-                *) printf "Invalid Option. added to queue\n";;
-        esac
+        if [ -f "$filepath" ]; then
+                printf "$1 Already Exists!\n";
+        else
+                "$EDITOR" "$filepath";
+                printf "add to (d)rafts/(r)emove/add to (e)ntry queue\n[d/r/e]: ";
+                read -r choice;
+                case "$choice" in 
+                        d) mv "$filepath" "$DRAFTS"/"$1".md; printf "Added to drafts\n";;
+                        e) printf "Added to src, ready to finalize\n" ;;
+                        r) printf "Are you sure? [y/N]: ";
+                           read -r c;
+                           case "$c" in
+                                   y|Y) rm "$filepath";;
+                                   *) printf "Not Removed.\n";;
+                           esac;;
+                        *) printf "Invalid Option. added to queue\n";;
+                esac
+        fi
 }
-
+editpost() {
+        filepath="$SRC/$1.md";
+        if [ -f "$filepath" ]; then
+                "$EDITOR" "$filepath";
+        else
+                printf "$1 Doesn't exist!\n"
+        fi
+}
 # Edit existing drafts
 editdrafts () {
         if [ -z "$1" ]; then
@@ -138,7 +150,6 @@ finalize () {
         FILES=$(find "$SRC" -maxdepth 1 -name "*.md" -type f -printf "\n%AD %AT %p" | tail -n +2 | sort -k1.8n -k1.1nr -k1 | cut -d' ' -f3) # sort .md files by time from oldest to newest.
         for entry in $FILES;
         do
-                echo "$entry";
                 file=$(basename "$entry");
                 RAWHTML=$ENTRIES/${file%.md}-tmp.html;
                
@@ -159,18 +170,20 @@ finalize () {
 
 case $1 in
         n|new)    newpost "$2";; # Create a new markdown entry
+        e|edit)    editpost "$2";; # Create a new markdown entry
         l|list)   printf "List of entries:\n"
                 find "$SRC" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1;;
         s|summary) addsummary;;
         d|draft)  editdrafts "$2";;
         r|remove) rm "$ENTRIES"/"$2".html
                 rm "$SRC"/"$2".md \
-                        && printf "Removed %s from entries" "$2" \
-                        || printf "\n%s doesn't exist" "$2";;
+                        && printf "Removed %s from entries\n" "$2" \
+                        || printf "\n%s doesn't exist\n" "$2";;
         f|finalize) finalize;;
         *)      printf "esbu OPTION arg1 [arg2]\n"
                 printf "OPTIONS:\n"
                 printf "\tn, new - create new blog post\n"
+                printf "\te, edit - edit already existing blog posts\n"
                 printf "\tl, list - list all blog entries\n"
                 printf "\ts, summary - make index.html\n"
                 printf "\td, draft - edit drafts\n"
