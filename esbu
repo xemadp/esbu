@@ -18,7 +18,7 @@ SITE="example.com"
 # Make a new blog entry
 newpost () {
         filepath="$SRC/$1.md";
-        [ -z $1 ] && printf "Entry name cannot be empty!\n" && exit 1
+        [ -z "$1" ] && printf "Entry name cannot be empty!\n" && exit 1
         if [ -f "$filepath" ]; then
                 printf "%s Already exists!\n" "$1";
         else
@@ -43,7 +43,7 @@ newpost () {
 }
 
 editpost() {
-        [ -z $1 ] && printf "Entry name cannot be empty!\n" \
+        [ -z "$1" ] && printf "Entry name cannot be empty!\n" \
                   && printf "List of entries:\n" \
                   && find "$SRC" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1 \
                   && exit 1;
