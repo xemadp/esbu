@@ -7,6 +7,18 @@ Simple utility for creating and managing static blog-style pages, all in one bas
 * Capable of maintaining drafts.
 * Creates a page with the rolling view of the blog.
 * Creates an rss feed.
+* Creates an index.html page with a blog summary.
+
+## Installing 
+
+``` bash
+git clone "https://github.com/xemadp/esbu"
+cd esbu
+chmod +x esbu
+```
+open esbu and edit the SITE variable in esbu to whatever website you'd want to deploy to!
+you can copy esbu to your $PATH directory, but make sure you have the proper templates when you run
+it in a different directory!
 
 ## Requirements
 requires the markdown tool for converting .md files to .html files.
@@ -18,21 +30,24 @@ OPTIONS:
 * n, new - create new blog post
 * e, edit - edit already existing blog posts
 * l, list - list all blog entries
-* r, remove - remove a given entry name
+* rm, remove - remove a given entry 
+* r, rename - rename a given entry 
 * d, draft - edit drafts
+* fd, finishdraft - move draft to src folder - ready to finalize
 * f, finalize - finalize blog - ready to deploy
 
 EXAMPLES:
 
 * esbu new newpost  => creates a new entry as newpost.md
-* esbu remove newpost => removes newpost
+* esbu remove newpost => removes src/newpost.md and dst/entries/newpost.html (if it exists)
+* esbu r newpost post => renames src/newpost.md to src/post.md
+* esbu d newdraft => creates src/drafts/newdraft.md and opens it in editor
+* esbu fd newdraft => moves src/drafts/newdraft.md to src/newdraft.md
 * esbu list =>  lists all entries
+* esbu f =>  finalizes all entries
 
-### Make sure you edit the SITE variable in esbu to whatever website you'd want to deploy to!
 
-for example usage of esbu check out [this link](https://asciinema.org/a/502910)
-
-\*\*\* *NOTE*  that esbu will create needed folders if they don't exist upon execution in the directory you run it in, so make sure you already have templates folder when you run it, otherwise an empty template folder will be created which will break things.
+\*\*\* *NOTE*  that esbu will create needed folders if they don't exist in the directory you run it in, so make sure you already have proper templates when you run it, otherwise an empty template folder will be created which will break things.
 
 you can use `esbu new newentry` to start editing newentry.md after editing it you can either add it to entry queue or make it a draft.
 You can do `esbu finalize` to finalize every .md file in src(except for drafts).
@@ -41,7 +56,7 @@ when finalizing, previous entries that have been finalized before will also be i
 for example if you had entry1.md and finalized it yesterday, that means that if you create entry2.md today and finalize both entry1.md and entry2.md, entry1.md will not be finalized again. 
 
 ## Templates
-You need to have all the files that are in the templates folder, Make sure you edit templates to suit your own blog, You can practically change everything in templates *EXCEPT* from strings that are in this %FORMAT%, they are used in esbu in order to generate pages so don't delete/change them.
+You need to have all the files that are in the templates folder, Make sure you edit templates to suit your own blog, You can practically change everything in templates *EXCEPT* from strings that are in this %FORMAT%, they are used by esbu in order to generate pages so don't delete/change them.
 
 ### Features
 You can put `<!---height=Xpx-->` where X is the amount of pixels, after a photo in a markdown file and esbu will maintain the mentioned size in the html file as well.
