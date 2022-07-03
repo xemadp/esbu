@@ -9,8 +9,6 @@ SITE="example.com"
 
 [ -z "$EDITOR" ] && EDITOR=/usr/bin/nano
 
-[ -f "$SRC" ] || mkdir -p "$SRC"
-[ -f "$DST" ] || mkdir -p "$DST"
 [ -f "$DRAFTS" ] || mkdir -p "$DRAFTS"
 [ -f "$ENTRIES" ] || mkdir -p "$ENTRIES"
 [ -f "$TEMPLATES" ] || mkdir -p "$TEMPLATES"
