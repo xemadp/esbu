@@ -88,6 +88,7 @@ finishdrafts () {
         fi
 
 }
+
 # Get date from already published entry
 getdate () {
         filedir=$(echo "$1" | sed -e "s/dst\/entries/src/" -e "s/\.html/\.md/")
@@ -102,6 +103,7 @@ addsummary () {
         do
                 DATE=$(getdate "$t")
                 filename=$(basename "$t")
+
                 # Use the first markdown heading as the Title.
                 TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
                 sed -i "/%ENTRIES%/a <li>$DATE -<a href='https://$SITE/entries/$filename'> $TITLE <\/a><\/li>\\n" "$DST"/index.html
@@ -173,12 +175,6 @@ makepage () {
 # Take all markdown files in src/ (excluding drafts) and create corresponding html files in entries/,
 # also creates/updates rss feed , blogpage and index.html
 build () {
-        [ -f "$TEMPLATES"/index.html ] || printf
-        [ -f "$TEMPLATES"/entry.html ]
-        [ -f "$TEMPLATES"/blogpage.html ]
-        [ -f "$TEMPLATES"/item.xml ]
-        [ -f "$TEMPLATES"/rss.xml ]
-
 
         head -n -3 "$TEMPLATES"/rss.xml > "$DST"/rss.xml # initialize rss.xml to add items to later
 
