@@ -21,7 +21,7 @@ you can copy esbu to your $PATH directory, but make sure you have the proper tem
 it in a different directory!
 
 ## Requirements
-requires the markdown tool for converting .md files to .html files.
+requires the [markdown.pl](https://daringfireball.net/projects/markdown/) tool for converting .md files to .html files.
 
 ## Usage
 esbu OPTION arg1 [arg2]
