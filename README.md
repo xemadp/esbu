@@ -33,8 +33,8 @@ OPTIONS:
 * rm, remove - remove a given entry 
 * r, rename - rename a given entry 
 * d, draft - edit drafts
-* fd, finishdraft - move draft to src folder - ready to finalize
-* f, finalize - finalize blog - ready to deploy
+* fd, finishdraft - move draft to src folder - ready to build
+* b, build - build blog - ready to deploy
 
 EXAMPLES:
 
@@ -44,16 +44,16 @@ EXAMPLES:
 * esbu d newdraft => creates src/drafts/newdraft.md and opens it in editor
 * esbu fd newdraft => moves src/drafts/newdraft.md to src/newdraft.md
 * esbu list =>  lists all entries
-* esbu f =>  finalizes all entries
+* esbu f =>  builds all entries
 
 
 \*\*\* *NOTE*  that esbu will create needed folders if they don't exist in the directory you run it in, so make sure you already have proper templates when you run it, otherwise an empty template folder will be created which will break things.
 
 you can use `esbu new newentry` to start editing newentry.md after editing it you can either add it to entry queue or make it a draft.
-You can do `esbu finalize` to finalize every .md file in src(except for drafts).
+You can do `esbu build` to build every .md file in src(except for drafts).
 finalizing basically means all .md files in src will be turned to .html files, rss, summary and blog pages will be also be generated.
-when finalizing, previous entries that have been finalized before will also be ignored,
-for example if you had entry1.md and finalized it yesterday, that means that if you create entry2.md today and finalize both entry1.md and entry2.md, entry1.md will not be finalized again. 
+when building, previous entries that have been built before will also be ignored,
+for example if you had entry1.md and built it yesterday, that means that if you create entry2.md today and build both entry1.md and entry2.md, entry1.md will not be built again. 
 
 ## Templates
 You need to have all the files that are in the templates folder, Make sure you edit templates to suit your own blog, You can practically change everything in templates *EXCEPT* from strings that are in this %FORMAT%, they are used by esbu in order to generate pages so don't delete/change them.
@@ -72,7 +72,7 @@ will be :
 `<p><img src="image.jpg" alt="" style="width:100%;height:auto';max-width:350px" ></p>`
 
 and thus maintaining the size mentioned.
-You can deactiate this by uncommenting the second markdown line in finalize function.
+You can deactiate this by uncommenting the sed command after the markdown command in build function.
 
 
 ## TODO
