@@ -29,6 +29,7 @@ newpost () {
         fi
 }
 
+# Edit already built entry
 editpost() {
         [ -z "$1" ] && printf "Entry name cannot be empty!\n" \
                   && printf "List of entries:\n" \
@@ -66,6 +67,7 @@ editdrafts () {
         fi
 }
 
+# move a draft to entries folder
 finishdrafts () {
         if [ -z "$1" ]; then
                 printf "No draft selected.\nDrafts:\n"
@@ -129,7 +131,7 @@ sortfiles() {
         fi
 }
 
-# Create the "blogpage" which is a rolling view of blog posts.
+# Create "blogpage.html" which is page containing a rolling view of all blog posts.
 blogpage () {
         cat "$TEMPLATES"/blogpage.html > "$DST"/blogpage.html;
         for t in $LATEST;
