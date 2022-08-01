@@ -77,5 +77,4 @@ You can deactiate this by uncommenting the sed command after the markdown comman
 
 ## TODO
 
-- [ ] Add custom sync script support;
 - [x] Add dates to markdown entries
