@@ -241,6 +241,6 @@ case $1 in
                 printf "EXAMPLES:\n"
                 printf "\tesbu new newpost  => creates a new entry as newpost.md\n"
                 printf "\tesbu list =>  lists all entries\n"
-                printf "\tesbu r newpost => removes newpost\n";;
+                printf "\tesbu rm newpost => removes newpost\n";;
 esac
 exit $?
