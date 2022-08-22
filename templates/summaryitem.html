@@ -10,13 +10,19 @@
     body{
         margin:1em auto;
         max-width:40em;
+        padding:0 .62em;
         font: sans-serif
     }
+        .vertical {
+            padding:15px auto;
+            border-left: 2.3px solid gray;
+            height: 180px auto;
+        }
         .footer {
                   position: absolute;
                   bottom: 0px;
                   background-color: #111;
-                  width: 40%;
+                  width: 45%;
                   text-align: center;
                   font:0.8em/1.62 sans-serif
          }
@@ -26,6 +32,11 @@
     }
     h1,h2,h3 {
         line-height:1.2
+    }
+    .summary {
+        margin:20px;
+        line-height:0;
+
     }
     @media print{
         body{
@@ -52,14 +63,23 @@
 
 <p>This is a simple template for the summary page!</p>
 
-<h4 style='margin-bottom:0px'>The Most Recent Blog Post:</h4>
+<h3> Blog Entries:</h3>
+<h3 class="summary">%TITLE%</h3>
+<p class="summary">%DATE%</p>
+<p style="margin:20px">
+%CONTENT%
+</p>
 
-<div style="border:1px solid #969696;margin-right:-9px">
-    <ul>
+<div class="summary">
+<h3 >How to install Nethack</h3>
+<p style="line-height:20px">
+%CONTENT%
+...
+</p>
+<p >Date: 2022-12-11</p>
+<p>more</p>
+<div>
 
-    %ENTRIES%
-
-    </ul>
 </div>
 </body>
 </head>

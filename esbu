@@ -97,19 +97,21 @@ getdate () {
         date -R -d "$(grep -h -m 1 "the creation date is: " "$filedir" | sed -e "s/<\!---the creation date is: //" -e "s/--->//g")" | cut -c -16 | cut -c 6-; 
 }
 
-# Add index summary of posts
+# creates index.html alongside the summary of the most recent blog post
 addsummary () {
         cat "$TEMPLATES"/index.html > "$DST"/index.html
         # Take 5 of the latest posts and order them from new to oldest.
-        for t in $(echo "$LATEST" | tail -n5);
-        do
-                DATE=$(getdate "$t")
-                filename=$(basename "$t")
+        t=$(echo "$LATEST" | tail -n1);
+        DATE=$(getdate "$t")
+        filename=$(basename "$t")
 
-                # Use the first markdown heading as the Title.
-                TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
-                sed -i "/%ENTRIES%/a <li>$DATE -<a href='https://$SITE/entries/$filename'> $TITLE <\/a><\/li>\\n" "$DST"/index.html
-        done
+        # Use the first markdown heading as the Title.
+        TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
+        SUMMARY=$(sed -e "s/#.*//g" -e "s/.*<.*//g" "$SRC"/"${filename%.html}".md | tr "\n" " " | head -c400)
+        sed -i "/%ENTRIES%/a <p style='line-height:0px;margin-left:60%;text-align:center'><a href='https://$SITE/entries/$filename'> read more <\/a><//p>" "$DST"/index.html
+        sed -i "/%ENTRIES%/a <p style='font:0.9em sans-serif;margin-right:30px'>$SUMMARY... <//p>" "$DST"/index.html
+        sed -i "/%ENTRIES%/a <p style='font:0.8em sans-serif;text-align:center;margin-right:5%;margin-top:0%'>Date: $DATE</p><hr style='margin-right:30px'>" "$DST"/index.html
+        sed -i "/%ENTRIES%/a <p style='font:1.2em sans-serif;text-align:center;margin-right:5%;margin-bottom:0%'>$TITLE</p>" "$DST"/index.html
         sed -i "s/%ENTRIES%//" "$DST"/index.html;
         sed -i "s/%DATE%/$DATE/" "$DST"/index.html; 
 }
@@ -140,7 +142,7 @@ blogpage () {
                 filename=$(basename "$t");
                 # Use the first markdown heading as the Title.
                 TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
-                sed -i "/%ENTRIES%/a <li><a href='https://$SITE/entries/$filename'>$DATE : $TITLE <\/a><\/li>\\n" "$DST"/blogpage.html; 
+                sed -i "/%ENTRIES%/a <li><a href='https://$SITE/entries/$filename'>$DATE : $TITLE <\/a><\/li>" "$DST"/blogpage.html; 
         done
         sed -i "s/%ENTRIES%//" "$DST"/blogpage.html;
 }

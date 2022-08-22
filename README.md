@@ -7,7 +7,7 @@ Simple utility for creating and managing static blog-style pages, all in one bas
 * Capable of maintaining drafts.
 * Creates a page with the rolling view of the blog.
 * Creates an rss feed.
-* Creates an index.html page with a blog summary.
+* Creates an index.html page with the summary of the most recent blog post.
 
 ## Installing 
 
