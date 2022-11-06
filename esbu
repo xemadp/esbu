@@ -142,7 +142,7 @@ blogpage () {
                 filename=$(basename "$t");
                 # Use the first markdown heading as the Title.
                 TITLE=$(grep -m 1 "#" "$SRC"/"${filename%.html}".md | tr -d '#' )
-                sed -i "/%ENTRIES%/a <li><a href='https://$SITE/entries/$filename'>$DATE : $TITLE <\/a><\/li>" "$DST"/blogpage.html; 
+                sed -i "/%ENTRIES%/a <li>$DATE -<a href='https://$SITE/entries/$filename'>$TITLE <\/a><\/li>" "$DST"/blogpage.html; 
         done
         sed -i "s/%ENTRIES%//" "$DST"/blogpage.html;
 }
@@ -154,7 +154,7 @@ additem () {
         TITLE=$(grep -m 1 "#" "$1" | tr -d '#' ); # Use the first heading as the Title.
 
         cat "$TEMPLATES"/item.xml >> "$DST"/rss.xml;
-        sed -i -e "s:%NAME%:$NAME:" \
+        sed -i -e "s:%NAME%:$TITLE:" \
             -e "s/%URL%/entries\/${2%.md}.html/" \
             -e "s/%DATE%/$DATE/" -e "s/%CONTENT%]]><\/description>//" "$DST"/rss.xml;
 
