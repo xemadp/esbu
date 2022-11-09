@@ -101,5 +101,5 @@ template files that have it.
 ## TODO
 
 - [x] Add dates to markdown entries
-- [] Include blog post summaries in tag specific pages.
-- [] embed tags into markdown files and construct html tag files using markdown files
+- [ ] Include blog post summaries in tag specific pages.
+- [ ] embed tags into markdown files and construct html tag files using markdown files
