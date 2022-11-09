@@ -58,7 +58,7 @@ for example if you had entry1.md and built it yesterday, that means that if you 
 ## Templates
 You need to have all the files that are in the templates folder, Make sure you edit templates to suit your own blog, You can practically change everything in templates *EXCEPT* from strings that are in this %FORMAT%, they are used by esbu in order to generate pages so don't delete/change them.
 
-### Features
+## Optional Functionality
 You can put `<!---height=Xpx-->` where X is the amount of pixels, after a photo in a markdown file and esbu will maintain the mentioned size in the html file as well.
 example:
 
@@ -74,7 +74,32 @@ will be :
 and thus maintaining the size mentioned.
 You can deactiate this by uncommenting the sed command after the markdown command in build function.
 
+<hr>
+
+If tags.txt is present and in the following format:
+``` txt
+entry1.md: Tag1 Tag2 Tag3
+entry2.md: Tag1 Tag2 Tag3 Tag4
+entry3.md: Tag1
+```
+then you'll get pages for every single tag while also having
+tags embedded in entries and blogpage.html 
+you can optionally use my givetag script to add tags to entries.
+Otherwise you'll have to do it manually.
+Example tags.txt:
+```
+/home/user/media/website/src/entry1.md: life personal linux
+/home/user/media/website/src/entry2.md: linux bash programming
+/home/user/media/website/src/entry1.md: server linux
+```
+In order to remove this functionality completely, simply remove %TAGS% from all 
+template files that have it.
+
+## Optional Dependencies
+- [givetag](https://github.com/xemadp/Scripts/blob/master/givetag) - Used to tag posts and create tags.txt.
 
 ## TODO
 
 - [x] Add dates to markdown entries
+- [] Include blog post summaries in tag specific pages.
+- [] embed tags into markdown files and construct html tag files using markdown files

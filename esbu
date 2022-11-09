@@ -1,10 +1,10 @@
 #!/bin/sh
-
 SRC=$(pwd)/src
 DST=$(pwd)/dst
 DRAFTS=$(pwd)/src/drafts
 TEMPLATES=$(pwd)/templates
 ENTRIES=$(pwd)/dst/entries
+TAGS=$(pwd)/tags.txt
 SITE="example.com"
 
 [ -z "$EDITOR" ] && EDITOR=/usr/bin/nano
@@ -166,6 +166,60 @@ additem () {
         echo "</item>" >> "$DST"/rss.xml;
 }
 
+# create tags.html using the template and information present in tags.txt
+addtags() {
+        mkdir -p "$DST"/tags
+        # for files that have $1 as a tag, add their link under %TAGS% then proceed by adding #$1 on top of them
+        taglist=$(sed "s/.*: //" "$TAGS" | tr " " "\n" | sort | uniq) # get a unique list of all of the tags used in tags.txt
+        for tag in $taglist;
+        do
+                sed -i "/%TAGS%/a <a href='https://$SITE/tags/$tag.html'>$tag <\/a> | " "$DST"/blogpage.html; # Add tags to blogpage.html
+                cat "$TEMPLATES"/tags.html > "$DST"/tags/"$tag".html # Create tags.html
+                files=$(grep "$tag" "$TAGS" | cut -d' ' -f1 | sed "s/.$//") # get filepath of every file that has the tag $tag from tags.txt
+                for entry in $files;
+                do
+                        entrybn=$(basename "$entry") # get entry basename
+                        # Get date and title from $entry and construct each item.
+                        TITLE=$(grep -m 1 "#" "$entry" | tr -d '#' ); # Use the first heading as the Title.
+                        DATE=$(getdate "$entry") # Set the date
+                        sed -i "/%TAGS%/a <li>$DATE -<a href='https://$SITE/entries/${entrybn%.md}.html'>$TITLE <\/a><\/li>" "$DST"/tags/"$tag".html; 
+        
+                done
+
+                # Add tag as title
+                sed -i "s/%TITLE%/$tag | emadp.xyz/" "$DST"/tags/"$tag".html; 
+                sed -i "/%TAGS%/a <h1> $tag </h1>" "$DST"/tags/"$tag".html; 
+                sed -i "s/%TAGS%//" "$DST"/tags/"$tag".html;
+        done 
+
+        # Add tags to entries
+        
+        files=$(sed "s/md:.*/md/" "$TAGS") # get filepath of every file that has the tag $tag from tags.txt
+        for entry in $files;
+        do
+                entrybn=$(basename "$entry") # get entry basename
+                taglist=$(grep $entrybn $TAGS | sed "s/.*md: //"| tr " " "\n" | sort | uniq ) # get a unique list of all of the tags given to $entry
+                for tag in $taglist;
+                do
+                        sed -i "/%TAGS%/a <a href='https://$SITE/tags/$tag.html'>$tag <\/a> |  " "$ENTRIES"/"${entrybn%.md}".html; 
+                done
+                sed -i "/%TAGS%/a  |  " "$ENTRIES"/"${entrybn%.md}".html; 
+        done
+        
+        # Delete %TAGS%  from files
+        files=$(find "$ENTRIES" -name "*.html") # get filepath of every file that has the tag $tag from tags.txt
+        for entry in $files;
+        do
+                entrybn=$(basename "$entry") # get entry basename
+                taglist=$(grep $entrybn $TAGS | sed "s/.*md: //"| tr " " "\n" | sort | uniq ) # get a unique list of all of the tags given to $entry
+                sed -i "s/%TAGS%//" "$ENTRIES"/"$entrybn";
+        done
+
+        # Complete blogpage tags and Remove %TAGS% from blogpage.html
+        sed -i "/%TAGS%/a | " "$DST"/blogpage.html; # Add | to the beginning of Tags
+        sed -i "s/%TAGS%//" "$DST"/blogpage.html;
+}
+
 # Make new individual entry
 makepage () { 
         NAME=$(grep -m 1 "#" "$SRC/$1" | tr -d '#' ); # Use the first heading as the Name.
@@ -205,6 +259,7 @@ build () {
         echo "</rss>" >> "$DST"/rss.xml
         addsummary;
         blogpage;
+        [ -f tags.txt ] && addtags;
 }
 
 case $1 in
