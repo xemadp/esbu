@@ -262,6 +262,19 @@ build () {
         [ -f tags.txt ] && addtags;
 }
 
+tree () {
+        drafts=$(find "$DRAFTS" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1)
+        entries=$(find "$ENTRIES" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1)
+        printf "Entries:\n"
+        for entry in $entries; do
+                printf "\t - $entry.md\n"
+        done
+        printf "Drafts:\n"
+        for draft in $drafts; do
+                printf "\t - $draft.md\n"
+        done
+}
+
 case $1 in
         n|new)    newpost "$2";; # Create a new markdown entry
 
@@ -285,6 +298,8 @@ case $1 in
 
         b|build) build;;
 
+        t|tree) tree;;
+
         *)      printf "USAGE: esbu OPTION arg1 [arg2]\n"
                 printf "OPTIONS:\n"
                 printf "\tn, new - create new blog post\n"
@@ -295,6 +310,7 @@ case $1 in
                 printf "\tb, build - build blog - ready to deploy\n"
                 printf "\trm, remove - remove a given entry\n"
                 printf "\tr, rename - rename a given entry\n"
+                printf "\tt, tree - displays a tree of all entries and drafts\n"
                 printf "EXAMPLES:\n"
                 printf "\tesbu new newpost  => creates a new entry as newpost.md\n"
                 printf "\tesbu list =>  lists all entries\n"

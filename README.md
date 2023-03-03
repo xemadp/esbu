@@ -35,6 +35,7 @@ OPTIONS:
 * d, draft - edit drafts
 * fd, finishdraft - move draft to src folder - ready to build
 * b, build - build blog - ready to deploy
+* t, tree - displays a tree of all entries and drafts
 
 EXAMPLES:
 
@@ -45,6 +46,7 @@ EXAMPLES:
 * esbu fd newdraft => moves src/drafts/newdraft.md to src/newdraft.md
 * esbu list =>  lists all entries
 * esbu f =>  builds all entries
+* esbu t => show a tree of all entries and drafts
 
 
 \*\*\* *NOTE*  that esbu will create needed folders if they don't exist in the directory you run it in, so make sure you already have proper templates when you run it, otherwise an empty template folder will be created which will break things.
