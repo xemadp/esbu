@@ -33,11 +33,7 @@ OPTIONS:
 * rm, remove - remove a given entry 
 * r, rename - rename a given entry 
 * d, draft - edit drafts
-* fd, finishdraft - move draft to src folder - ready to build
-* b, build - build blog - ready to deploy
-* t, tree - displays a tree of all entries and drafts
-
-EXAMPLES:
+* fd, finishdraft - move draft to src folder - ready to build b, build - build blog - ready to deploy t, tree - displays a tree of all entries and drafts EXAMPLES:
 
 * esbu new newpost  => creates a new entry as newpost.md
 * esbu remove newpost => removes src/newpost.md and dst/entries/newpost.html (if it exists)
@@ -90,9 +86,9 @@ you can optionally use my givetag script to add tags to entries.
 Otherwise you'll have to do it manually.
 Example tags.txt:
 ```
-/home/user/media/website/src/entry1.md: life personal linux
-/home/user/media/website/src/entry2.md: linux bash programming
-/home/user/media/website/src/entry1.md: server linux
+/path/to/entry1.md: life personal linux
+/path/to/entry2.md: linux bash programming
+/path/to/entry3.md: server linux
 ```
 In order to remove this functionality completely, simply remove %TAGS% from all 
 template files that have it.
