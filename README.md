@@ -90,7 +90,7 @@ Example tags.txt:
 /path/to/entry2.md: linux bash programming
 /path/to/entry3.md: server linux
 ```
-In order to remove this functionality completely, simply remove %TAGS% from all 
+In order to remove this functionality completely, simply remove tags.txt and %TAGS% from all 
 template files that have it.
 
 ## Optional Dependencies
