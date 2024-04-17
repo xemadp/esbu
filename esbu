@@ -259,19 +259,19 @@ build () {
         echo "</rss>" >> "$DST"/rss.xml
         addsummary;
         blogpage;
-        [ -f tags.txt ] && addtags;
+        [ -f tags.txt ] && addtags; # ONLY ADD TAGS IF tags.txt is present
 }
 
 tree () {
         drafts=$(find "$DRAFTS" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1)
         entries=$(find "$ENTRIES" -maxdepth 1 -type f -exec basename {} \; | cut -d'.' -f1)
-        printf "Entries:\n"
+        printf "Entries:\n\n"
         for entry in $entries; do
-                printf "\t - $entry.md\n"
+                printf "- $entry.md\n"
         done
-        printf "Drafts:\n"
+        printf "\nDrafts:\n\n"
         for draft in $drafts; do
-                printf "\t - $draft.md\n"
+                printf "- $draft.md\n"
         done
 }
 
