@@ -187,7 +187,7 @@ addtags() {
                 done
 
                 # Add tag as title
-                sed -i "s/%TITLE%/$tag | emadp.xyz/" "$DST"/tags/"$tag".html; 
+                sed -i "s/%TITLE%/$tag" "$DST"/tags/"$tag".html; 
                 sed -i "/%TAGS%/a <h1> $tag </h1>" "$DST"/tags/"$tag".html; 
                 sed -i "s/%TAGS%//" "$DST"/tags/"$tag".html;
         done 
